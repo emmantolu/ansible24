@@ -1,0 +1,64 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: Install apache2 and support packages (Ubuntu)
+    apt:
+      update_cache: yes
+      name:
+        - apache2
+        - libapache2-mod-php 
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install apache2 and support packages (Oracle Linux)
+    dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "OracleLinux"
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: Insatll MariaDB package (Oracle Linux)
+    dnf:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "OracleLinux"
+
+  - name: Install MariaDB package (Ubuntu)
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+
+- hosts: file_servers
+  become: true
+  tasks:
+
+  - name: Install Samba package
+    package: 
+      name: samba
+      state: latest
+
+
+- hosts: work_stations
+  become: true
+  tasks:
+  
+  - name: Install Vim and Gedit packages
+    package:
+       name:
+         - vim
+         - gedit
+       state: latest

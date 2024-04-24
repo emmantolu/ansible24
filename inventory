@@ -1,2 +1,13 @@
+[file_servers]
+server1
+
+[web_servers]
+server1
+server2
+
+[db_servers]
+oracle
+
+[work_stations]
 server1
 server2
