@@ -2,12 +2,12 @@
 server1
 
 [web_servers]
-server1
+192.168.152.20 ansible_host=server1
 server2
-oracle
+oracle_db
 
 [db_servers]
-oracle
+oracle_db
 
 [work_stations]
 server1

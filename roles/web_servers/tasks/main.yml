@@ -1,0 +1,37 @@
+- name: Install apache2 and support packages (Ubuntu)
+  tags: apache,php,ubuntu
+  apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install apache2 and support packages (Oracle Linux)
+  tags: apache,httpd,php,oracleLinux
+  dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+  when: ansible_distribution == "OracleLinux"
+
+- name: Copy default html file to site
+  tags: apache,apache2,httpd,html
+  copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: www-data
+      group: www-data
+      mode: 0644
+  when: ansible_distribution == "Ubuntu"
+
+- name: Copy default html file to site
+  tags: apache,apache2,httpd,html
+  copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: apache
+      group: apache
+      mode: 0644
+  when: ansible_distribution == "OracleLinux"

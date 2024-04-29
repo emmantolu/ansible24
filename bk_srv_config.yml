@@ -1,0 +1,153 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+
+    - name: Add ssh key for mustafa
+      tags: mustafa
+      authorized_key:
+         user: mustafa
+         key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPs7/EnMuPiJFJnZ9QWPbD10gwTo0bwVJ6Rf2Yrhz4xQ Ansible access
+
+
+    - name: Install Updates (Oracle Linux)
+      tags: update,oracleLinux
+      dnf:
+        update_only: yes
+        update_cache: yes
+      changed_when: false
+      when: ansible_distribution == "OracleLinux"
+
+    - name: Install Updates (Ubuntu)
+      tags: update,ubuntu
+      apt:
+        update_only: yes
+        update_cache: yes
+      changed_when: false
+      when: ansible_distribution == "Ubuntu"
+
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: Install apache2 and support packages (Ubuntu)
+    tags: apache,php,ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php 
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install apache2 and support packages (Oracle Linux)
+    tags: apache,httpd,php,oracleLinux
+    dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "OracleLinux"
+
+  - name: Copy default html file to site
+    tags: apache,apache2,httpd,html
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: www-data
+      group: www-data
+      mode: 0644
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Copy default html file to site
+    tags: apache,apache2,httpd,html
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: apache
+      group: apache
+      mode: 0644
+    when: ansible_distribution == "OracleLinux"
+
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: Install MariaDB package (Oracle Linux)
+    tags: db,mariadb,oracleLinux
+    dnf:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "OracleLinux"
+
+  - name: Install MariaDB package (Ubuntu)
+    tags: db,mariadb,ubuntu
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Start httpd
+    tags: start_httpd,httpd
+    service:
+       name: httpd
+       state: started
+       enabled: yes
+    when: ansible_distribution == "OracleLinux"
+
+  - name: Change email address for Admin (Oracle Linux)
+    tags: apache,httpd
+    lineinfile:
+       path: /etc/httpd/conf/httpd.conf
+       regexp: "^ServerAdmin"
+       line: ServerAdmin o.toluham@gmail.com
+    when: ansible_distribution == "OracleLinux"
+    register: email
+
+  - name: restart httpd (Oracle Linux)
+    tags: apache,httpd,oracleLinux
+    service:
+      name: httpd
+      state: restarted
+    when: email.changed
+
+
+- hosts: file_servers
+  become: true
+  tasks:
+
+  - name: Install Samba package
+    package: 
+      name: samba
+      state: latest
+
+
+- hosts: work_stations
+  become: true
+  tasks:
+  
+  - name: Install Vim and Gedit packages
+    package:
+       name:
+         - vim
+         - gedit
+       state: latest
+
+  - name: Install unzip package
+    tags: unzip
+    package:
+      name: unzip
+      state: latest
+
+  - name: Install OpenToFu
+    tags: unzip,opentofu
+    unarchive:
+      src: https://github.com/opentofu/opentofu/releases/download/v1.6.2/tofu_1.6.2_linux_amd64.zip 
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root

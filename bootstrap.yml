@@ -10,6 +10,7 @@
         name: webadmin
         shell: /bin/bash
         groups: www-data
+        state: absent
       when: ansible_distribution == "Ubuntu"
 
     - name: Create webserver admin (Oracle Linux)
@@ -18,27 +19,23 @@
         name: webadmin
         shell: /bin/bash
         groups: apache
+        state: absent
       when: ansible_distribution == "OracleLinux"
 
+
+    - name: Creating User emmag
+      tags: emmag
+      user:
+        name: emmag
+        groups: root,tolu
+        shell: /bin/bash
+        state: absent 
+      register: absent
 
     - name: Creating user mustafa
       tags: mustafa
       user:
         name: mustafa
+        shell: /bin/bash
         groups: root
-        shell: /bin/bash 
-
-    - name: Add ssh key for mustafa
-      tags: mustafa
-      authorized_key:
-         user: mustafa
-         key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPs7/EnMuPiJFJnZ9QWPbD10gwTo0bwVJ6Rf2Yrhz4xQ Ansible access
-
-    - name: Make mustafa sudoer
-      tags: mustafa
-      copy:
-        src: sudoer_mustafa
-        dest: /etc/sudoers.d/mustafa
-        owner: root
-        group: root
-        mode: 0440
+        state: absent 

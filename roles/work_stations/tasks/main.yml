@@ -1,0 +1,23 @@
+- name: Install Vim and Gedit packages
+  package:
+       name:
+         - vim
+         - gedit
+       state: latest
+
+- name: Install unzip package
+  tags: unzip
+  package:
+      name: unzip
+      state: latest
+
+- name: Install OpenToFu
+  tags: unzip,opentofu
+  unarchive:
+      src: https://github.com/opentofu/opentofu/releases/download/v1.6.2/tofu_1.6.2_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+

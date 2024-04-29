@@ -1,0 +1,21 @@
+- name: Add ssh key for mustafa
+  tags: mustafa
+  authorized_key:
+    user: mustafa
+    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPs7/EnMuPiJFJnZ9QWPbD10gwTo0bwVJ6Rf2Yrhz4xQ Ansible access
+
+- name: Install Updates (Oracle Linux)
+  tags: update,oracleLinux
+  dnf:
+    update_only: yes
+    update_cache: yes
+  changed_when: false
+  when: ansible_distribution == "OracleLinux"
+
+- name: Install Updates (Ubuntu)
+  tags: update,ubuntu
+  apt:
+    update_cache: yes
+  changed_when: false
+  when: ansible_distribution == "Ubuntu"
+
